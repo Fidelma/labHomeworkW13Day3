@@ -7,6 +7,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,5 +39,25 @@ public class WhiskyRepositoryImpl implements WhiskyRepositoryCustom {
         }
         return results;
 
+    }
+
+    @Transactional
+    public List<Whisky> findWhiskiesFromRegion(String region){
+        List<Whisky> results = null;
+
+
+        try {
+            Session session = entityManager.unwrap(Session.class);
+            Criteria cr = session.createCriteria(Whisky.class);
+            cr.createAlias("distillery", "dist");
+            cr.add(Restrictions.eq("dist.region", region));
+            results = cr.list();
+        }
+
+        catch(HibernateException ex) {
+            ex.printStackTrace();
+        }
+
+        return results;
     }
 }
